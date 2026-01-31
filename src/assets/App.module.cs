@@ -1,0 +1,588 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* App Container */
+.appContainer {
+  min-height: 100vh;
+  background: #f7fafc;
+  padding: 40px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode for App Container */
+.darkMode {
+  background: #1a202c;
+  color: #e2e8f0;
+}
+
+/* Header */
+.galleryHeader {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  position: relative;
+}
+
+.galleryHeader h1 {
+  font-size: 2.5rem;
+  color: #1a202c;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.darkMode .galleryHeader h1 {
+  color: #f7fafc;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 20px;
+}
+
+.darkMode .tagline {
+  color: #cbd5e0;
+}
+
+/* Mode Toggle Button */
+.modeToggle {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.modeToggle:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.modeToggle:active {
+  transform: translateY(-1px);
+}
+
+/* Introduction Section */
+.introSection {
+  max-width: 700px;
+  margin: 0 auto 50px;
+  text-align: center;
+  background: white;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.darkMode .introSection {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.introSection h2 {
+  font-size: 1.8rem;
+  color: #2d3748;
+  margin-bottom: 15px;
+}
+
+.darkMode .introSection h2 {
+  color: #f7fafc;
+}
+
+.bioText {
+  font-size: 1.05rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.darkMode .bioText {
+  color: #cbd5e0;
+}
+
+.contactInfo {
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 10px;
+}
+
+.darkMode .contactInfo {
+  color: #a0aec0;
+}
+
+.contactInfo a {
+  color: #3182ce;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.darkMode .contactInfo a {
+  color: #63b3ed;
+}
+
+.contactInfo a:hover {
+  text-decoration: underline;
+}
+
+/* Edit Mode Styles */
+.editMode {
+  margin-top: 20px;
+}
+
+.editInput {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2d3748;
+  background: white;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.darkMode .editInput {
+  background: #1a202c;
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.editHint {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.darkMode .editHint {
+  color: #a0aec0;
+}
+
+/* Filter Controls */
+.filterControls {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.darkMode .filterControls {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.darkMode .filterGroup label {
+  color: #e2e8f0;
+}
+
+.filterDropdown,
+.searchInput {
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2d3748;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.darkMode .filterDropdown,
+.darkMode .searchInput {
+  background: #1a202c;
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.filterDropdown:focus,
+.searchInput:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.filterDropdown:hover,
+.searchInput:hover {
+  border-color: #cbd5e0;
+}
+
+.resetButton {
+  padding: 10px 24px;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: fit-content;
+}
+
+.resetButton:hover {
+  background: #c53030;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.resetButton:active {
+  transform: translateY(0);
+}
+
+/* View Mode Button */
+.viewModeButton {
+  padding: 10px 24px;
+  background: #38b2ac;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: fit-content;
+}
+
+.viewModeButton:hover {
+  background: #2c7a7b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+}
+
+.viewModeButton:active {
+  transform: translateY(0);
+}
+
+/* Section Wrapper */
+.sectionWrapper {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.darkMode .sectionWrapper {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  color: #2d3748;
+  margin-bottom: 25px;
+  text-align: center;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.darkMode .sectionTitle {
+  color: #f7fafc;
+  border-bottom-color: #4a5568;
+}
+
+.sectionContent {
+  padding: 20px 0;
+}
+
+/* Cards Container */
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+/* Profile Card */
+.profileCard {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.profileCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark Mode Card */
+.darkCard {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.darkCard:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.featuredCard {
+  border: 2px solid #3182ce;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+}
+
+.darkMode .featuredCard {
+  background: linear-gradient(135deg, #2d3748 0%, #2c5282 100%);
+  border-color: #63b3ed;
+}
+
+.featuredBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #3182ce;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.darkMode .featuredBadge {
+  background: #63b3ed;
+  color: #1a202c;
+}
+
+/* Avatar */
+.avatarCircle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  border: 4px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+}
+
+.darkMode .avatarCircle {
+  border-color: #4a5568;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card Content */
+.cardName {
+  font-size: 1.3rem;
+  color: #1a202c;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.darkMode .cardName {
+  color: #f7fafc;
+}
+
+.cardRole {
+  font-size: 0.95rem;
+  color: #3182ce;
+  margin-bottom: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.darkMode .cardRole {
+  color: #63b3ed;
+}
+
+.cardYear {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.darkMode .cardYear {
+  color: #a0aec0;
+}
+
+.cardMajor {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.darkMode .cardMajor {
+  color: #cbd5e0;
+}
+
+.cardBio {
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.darkMode .cardBio {
+  color: #cbd5e0;
+}
+
+.cardEmail {
+  font-size: 0.9rem;
+  color: #718096;
+  margin-bottom: 20px;
+}
+
+.darkMode .cardEmail {
+  color: #a0aec0;
+}
+
+.cardEmail a {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.darkMode .cardEmail a {
+  color: #63b3ed;
+}
+
+.cardEmail a:hover {
+  text-decoration: underline;
+}
+
+/* Edit Email Container */
+.editEmailContainer {
+  margin-bottom: 20px;
+}
+
+.editLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.darkMode .editLabel {
+  color: #a0aec0;
+}
+
+/* Status Badges */
+.statusActive {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #48bb78;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.statusInactive {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #cbd5e0;
+  color: #2d3748;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* No Results Message */
+.noResults {
+  text-align: center;
+  color: #718096;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+}
+
+.darkMode .noResults {
+  color: #a0aec0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .galleryHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .introSection {
+    padding: 25px;
+  }
+  
+  .introSection h2 {
+    font-size: 1.5rem;
+  }
+  
+  .filterControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterGroup {
+    min-width: 100%;
+  }
+  
+  .resetButton,
+  .viewModeButton {
+    width: 100%;
+  }
+  
+  .sectionWrapper {
+    padding: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+  
+  .cardsContainer {
+    grid-template-columns: 1fr;
+  }
+}
