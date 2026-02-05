@@ -28,7 +28,6 @@ function Introduction({ viewMode }) {
       <h2>Hello, I'm {name}!</h2>
       <p className={styles.bioText}>{bio}</p>
       
-      {/* Conditional Rendering based on viewMode */}
       {viewMode === 'view' ? (
         <p className={styles.contactInfo}>
           Contact: <a href={`mailto:${email}`}>{email}</a>
@@ -48,6 +47,322 @@ function Introduction({ viewMode }) {
   );
 }
 
+// Add Profile Form Component
+function AddProfileForm({ onAddProfile, mode }) {
+  // Controlled form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: '',
+    bio: '',
+    avatarUrl: '',
+    year: '',
+    major: ''
+  });
+
+  // Error state
+  const [errors, setErrors] = useState({});
+  
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+    
+    // Clear success message when user starts editing
+    if (successMessage) {
+      setSuccessMessage('');
+    }
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    } else if (formData.name.trim().length > 50) {
+      newErrors.name = 'Name must be less than 50 characters';
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Title/Role validation
+    if (!formData.role.trim()) {
+      newErrors.role = 'Title is required';
+    } else if (formData.role.trim().length < 2) {
+      newErrors.role = 'Title must be at least 2 characters';
+    }
+
+    // Bio validation
+    if (!formData.bio.trim()) {
+      newErrors.bio = 'Bio is required';
+    } else if (formData.bio.trim().length < 10) {
+      newErrors.bio = 'Bio must be at least 10 characters';
+    } else if (formData.bio.trim().length > 200) {
+      newErrors.bio = 'Bio must be less than 200 characters';
+    }
+
+    // Image URL validation
+    if (!formData.avatarUrl.trim()) {
+      newErrors.avatarUrl = 'Image URL is required';
+    } else {
+      // Basic URL validation
+      try {
+        new URL(formData.avatarUrl);
+      } catch {
+        newErrors.avatarUrl = 'Please enter a valid URL';
+      }
+    }
+
+    // Year validation (optional field)
+    if (formData.year && (formData.year < 1900 || formData.year > 2100)) {
+      newErrors.year = 'Please enter a valid year';
+    }
+
+    // Major validation (optional field)
+    if (formData.major && formData.major.trim().length > 50) {
+      newErrors.major = 'Major must be less than 50 characters';
+    }
+
+    return newErrors;
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate form
+    const newErrors = validateForm();
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setSuccessMessage('');
+      return;
+    }
+
+    // Create new profile
+    const newProfile = {
+      id: Date.now(),
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      role: formData.role.trim(),
+      bio: formData.bio.trim(),
+      avatarUrl: formData.avatarUrl.trim(),
+      year: formData.year || '',
+      major: formData.major.trim() || '',
+      status: 'active',
+      isFeatured: false
+    };
+
+    // Add profile
+    onAddProfile(newProfile);
+
+    // Show success message
+    setSuccessMessage('✅ Profile added successfully!');
+
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      role: '',
+      bio: '',
+      avatarUrl: '',
+      year: '',
+      major: ''
+    });
+    
+    setErrors({});
+
+    // Clear success message after 5 seconds
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 5000);
+  };
+
+  return (
+    <section className={styles.formSection}>
+      <h2 className={styles.formTitle}>Add New Profile</h2>
+      
+      {successMessage && (
+        <div className={styles.successMessage}>
+          {successMessage}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className={styles.profileForm}>
+        {/* Name Field */}
+        <div className={styles.formGroup}>
+          <label htmlFor="name" className={styles.formLabel}>
+            Name <span className={styles.required}>*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.name ? styles.inputError : ''}`}
+            placeholder="Enter full name"
+          />
+          {errors.name && (
+            <span className={styles.errorMessage}>{errors.name}</span>
+          )}
+        </div>
+
+        {/* Email Field */}
+        <div className={styles.formGroup}>
+          <label htmlFor="email" className={styles.formLabel}>
+            Email <span className={styles.required}>*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.email ? styles.inputError : ''}`}
+            placeholder="email@example.com"
+          />
+          {errors.email && (
+            <span className={styles.errorMessage}>{errors.email}</span>
+          )}
+        </div>
+
+        {/* Title/Role Field */}
+        <div className={styles.formGroup}>
+          <label htmlFor="role" className={styles.formLabel}>
+            Title <span className={styles.required}>*</span>
+          </label>
+          <input
+            type="text"
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.role ? styles.inputError : ''}`}
+            placeholder="e.g., Developer, Designer, Data Scientist"
+          />
+          {errors.role && (
+            <span className={styles.errorMessage}>{errors.role}</span>
+          )}
+        </div>
+
+        {/* Bio Field */}
+        <div className={styles.formGroup}>
+          <label htmlFor="bio" className={styles.formLabel}>
+            Bio <span className={styles.required}>*</span>
+          </label>
+          <textarea
+            id="bio"
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            className={`${styles.formTextarea} ${errors.bio ? styles.inputError : ''}`}
+            placeholder="Write a brief bio (10-200 characters)"
+            rows="4"
+          />
+          <div className={styles.charCount}>
+            {formData.bio.length}/200 characters
+          </div>
+          {errors.bio && (
+            <span className={styles.errorMessage}>{errors.bio}</span>
+          )}
+        </div>
+
+        {/* Image URL Field */}
+        <div className={styles.formGroup}>
+          <label htmlFor="avatarUrl" className={styles.formLabel}>
+            Image URL <span className={styles.required}>*</span>
+          </label>
+          <input
+            type="url"
+            id="avatarUrl"
+            name="avatarUrl"
+            value={formData.avatarUrl}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.avatarUrl ? styles.inputError : ''}`}
+            placeholder="https://example.com/image.jpg"
+          />
+          {errors.avatarUrl && (
+            <span className={styles.errorMessage}>{errors.avatarUrl}</span>
+          )}
+          <small className={styles.fieldHint}>
+            Use services like Unsplash, Pexels, or upload to Imgur
+          </small>
+        </div>
+
+        {/* Year Field (Optional) */}
+        <div className={styles.formGroup}>
+          <label htmlFor="year" className={styles.formLabel}>
+            Graduation Year <span className={styles.optional}>(Optional)</span>
+          </label>
+          <input
+            type="number"
+            id="year"
+            name="year"
+            value={formData.year}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.year ? styles.inputError : ''}`}
+            placeholder="2025"
+            min="1900"
+            max="2100"
+          />
+          {errors.year && (
+            <span className={styles.errorMessage}>{errors.year}</span>
+          )}
+        </div>
+
+        {/* Major Field (Optional) */}
+        <div className={styles.formGroup}>
+          <label htmlFor="major" className={styles.formLabel}>
+            Major <span className={styles.optional}>(Optional)</span>
+          </label>
+          <input
+            type="text"
+            id="major"
+            name="major"
+            value={formData.major}
+            onChange={handleChange}
+            className={`${styles.formInput} ${errors.major ? styles.inputError : ''}`}
+            placeholder="e.g., Computer Science"
+          />
+          {errors.major && (
+            <span className={styles.errorMessage}>{errors.major}</span>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <button type="submit" className={styles.submitButton}>
+          Add Profile
+        </button>
+      </form>
+    </section>
+  );
+}
+
 // Section Wrapper Component
 function Section({ title, children }) {
   return (
@@ -60,9 +375,8 @@ function Section({ title, children }) {
   );
 }
 
-// Card Component with dynamic styling
+// Card Component
 function Card({ name, role, bio, email, status, avatarUrl, year, major, isFeatured, viewMode, mode }) {
-  // Dynamic class names based on mode and viewMode
   const cardClasses = `${styles.profileCard} ${isFeatured ? styles.featuredCard : ''} ${mode === 'dark' ? styles.darkCard : ''}`;
   const statusClass = status === "active" ? styles.statusActive : styles.statusInactive;
   
@@ -78,7 +392,6 @@ function Card({ name, role, bio, email, status, avatarUrl, year, major, isFeatur
       {major && <p className={styles.cardMajor}>{major}</p>}
       <p className={styles.cardBio}>{bio}</p>
       
-      {/* Conditional rendering based on viewMode */}
       {viewMode === 'view' ? (
         <p className={styles.cardEmail}>
           <a href={`mailto:${email}`}>{email}</a>
@@ -134,12 +447,11 @@ function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, 
         Reset Filters
       </button>
       
-      {/* View Mode Toggle */}
       <button 
         onClick={() => setViewMode(viewMode === 'view' ? 'edit' : 'view')} 
         className={styles.viewModeButton}
       >
-        {viewMode === 'view' ? 'Edit Mode' : 'View Mode'}
+        {viewMode === 'view' ? '✏️ Edit Mode' : '👁️ View Mode'}
       </button>
     </div>
   );
@@ -152,11 +464,11 @@ export default function App() {
   const [searchText, setSearchText] = useState('');
   
   // State for UI modes
-  const [mode, setMode] = useState('light'); // light or dark
-  const [viewMode, setViewMode] = useState('view'); // view or edit
+  const [mode, setMode] = useState('light');
+  const [viewMode, setViewMode] = useState('view');
   
-  // Array of card data
-  const profilesData = [
+  // State for profiles
+  const [profiles, setProfiles] = useState([
     {
       id: 1,
       name: "Arika Gibson",
@@ -193,13 +505,18 @@ export default function App() {
       avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
       isFeatured: false
     }
-  ];
+  ]);
+  
+  // Function to add new profile
+  const handleAddProfile = (newProfile) => {
+    setProfiles(prev => [...prev, newProfile]);
+  };
   
   // Get unique roles for dropdown
-  const uniqueRoles = [...new Set(profilesData.map(profile => profile.role))];
+  const uniqueRoles = [...new Set(profiles.map(profile => profile.role))];
   
   // Filter profiles based on role and search text
-  const filteredProfiles = profilesData.filter((profile) => {
+  const filteredProfiles = profiles.filter((profile) => {
     const matchesRole = roleFilter === '' || profile.role === roleFilter;
     const matchesSearch = searchText === '' || 
       profile.name.toLowerCase().includes(searchText.toLowerCase());
@@ -224,6 +541,9 @@ export default function App() {
     <div className={appClass}>
       <Header mode={mode} toggleMode={toggleMode} />
       <Introduction viewMode={viewMode} />
+      
+      {/* Add Profile Form */}
+      <AddProfileForm onAddProfile={handleAddProfile} mode={mode} />
       
       <FilterControls 
         roleFilter={roleFilter}
