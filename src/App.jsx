@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './App.module.css';
 
 // Header Component
@@ -34,13 +34,13 @@ function Introduction({ viewMode }) {
         </p>
       ) : (
         <div className={styles.editMode}>
-          <p className={styles.contactInfo}>📧 Email (editable):</p>
+          <p className={styles.contactInfo}>Email (editable):</p>
           <input 
             type="email" 
             defaultValue={email} 
             className={styles.editInput}
           />
-          <p className={styles.editHint}>✏️ Edit mode active - changes are for demonstration only</p>
+          <p className={styles.editHint}>Edit mode active - changes are for demonstration only</p>
         </div>
       )}
     </section>
@@ -49,7 +49,6 @@ function Introduction({ viewMode }) {
 
 // Add Profile Form Component
 function AddProfileForm({ onAddProfile, mode }) {
-  // Controlled form state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -60,13 +59,9 @@ function AddProfileForm({ onAddProfile, mode }) {
     major: ''
   });
 
-  // Error state
   const [errors, setErrors] = useState({});
-  
-  // Success message state
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -74,7 +69,6 @@ function AddProfileForm({ onAddProfile, mode }) {
       [name]: value
     }));
     
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -82,17 +76,14 @@ function AddProfileForm({ onAddProfile, mode }) {
       }));
     }
     
-    // Clear success message when user starts editing
     if (successMessage) {
       setSuccessMessage('');
     }
   };
 
-  // Validation function
   const validateForm = () => {
     const newErrors = {};
 
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     } else if (formData.name.trim().length < 2) {
@@ -101,7 +92,6 @@ function AddProfileForm({ onAddProfile, mode }) {
       newErrors.name = 'Name must be less than 50 characters';
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -109,14 +99,12 @@ function AddProfileForm({ onAddProfile, mode }) {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    // Title/Role validation
     if (!formData.role.trim()) {
       newErrors.role = 'Title is required';
     } else if (formData.role.trim().length < 2) {
       newErrors.role = 'Title must be at least 2 characters';
     }
 
-    // Bio validation
     if (!formData.bio.trim()) {
       newErrors.bio = 'Bio is required';
     } else if (formData.bio.trim().length < 10) {
@@ -125,11 +113,9 @@ function AddProfileForm({ onAddProfile, mode }) {
       newErrors.bio = 'Bio must be less than 200 characters';
     }
 
-    // Image URL validation
     if (!formData.avatarUrl.trim()) {
       newErrors.avatarUrl = 'Image URL is required';
     } else {
-      // Basic URL validation
       try {
         new URL(formData.avatarUrl);
       } catch {
@@ -137,12 +123,10 @@ function AddProfileForm({ onAddProfile, mode }) {
       }
     }
 
-    // Year validation (optional field)
     if (formData.year && (formData.year < 1900 || formData.year > 2100)) {
       newErrors.year = 'Please enter a valid year';
     }
 
-    // Major validation (optional field)
     if (formData.major && formData.major.trim().length > 50) {
       newErrors.major = 'Major must be less than 50 characters';
     }
@@ -150,11 +134,9 @@ function AddProfileForm({ onAddProfile, mode }) {
     return newErrors;
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validate form
     const newErrors = validateForm();
     
     if (Object.keys(newErrors).length > 0) {
@@ -163,7 +145,6 @@ function AddProfileForm({ onAddProfile, mode }) {
       return;
     }
 
-    // Create new profile
     const newProfile = {
       id: Date.now(),
       name: formData.name.trim(),
@@ -177,13 +158,9 @@ function AddProfileForm({ onAddProfile, mode }) {
       isFeatured: false
     };
 
-    // Add profile
     onAddProfile(newProfile);
+    setSuccessMessage('Profile added successfully!');
 
-    // Show success message
-    setSuccessMessage('✅ Profile added successfully!');
-
-    // Reset form
     setFormData({
       name: '',
       email: '',
@@ -196,7 +173,6 @@ function AddProfileForm({ onAddProfile, mode }) {
     
     setErrors({});
 
-    // Clear success message after 5 seconds
     setTimeout(() => {
       setSuccessMessage('');
     }, 5000);
@@ -213,7 +189,6 @@ function AddProfileForm({ onAddProfile, mode }) {
       )}
 
       <form onSubmit={handleSubmit} className={styles.profileForm}>
-        {/* Name Field */}
         <div className={styles.formGroup}>
           <label htmlFor="name" className={styles.formLabel}>
             Name <span className={styles.required}>*</span>
@@ -232,7 +207,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Email Field */}
         <div className={styles.formGroup}>
           <label htmlFor="email" className={styles.formLabel}>
             Email <span className={styles.required}>*</span>
@@ -251,7 +225,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Title/Role Field */}
         <div className={styles.formGroup}>
           <label htmlFor="role" className={styles.formLabel}>
             Title <span className={styles.required}>*</span>
@@ -270,7 +243,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Bio Field */}
         <div className={styles.formGroup}>
           <label htmlFor="bio" className={styles.formLabel}>
             Bio <span className={styles.required}>*</span>
@@ -292,7 +264,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Image URL Field */}
         <div className={styles.formGroup}>
           <label htmlFor="avatarUrl" className={styles.formLabel}>
             Image URL <span className={styles.required}>*</span>
@@ -314,7 +285,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           </small>
         </div>
 
-        {/* Year Field (Optional) */}
         <div className={styles.formGroup}>
           <label htmlFor="year" className={styles.formLabel}>
             Graduation Year <span className={styles.optional}>(Optional)</span>
@@ -335,7 +305,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Major Field (Optional) */}
         <div className={styles.formGroup}>
           <label htmlFor="major" className={styles.formLabel}>
             Major <span className={styles.optional}>(Optional)</span>
@@ -354,7 +323,6 @@ function AddProfileForm({ onAddProfile, mode }) {
           )}
         </div>
 
-        {/* Submit Button */}
         <button type="submit" className={styles.submitButton}>
           Add Profile
         </button>
@@ -451,7 +419,47 @@ function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, 
         onClick={() => setViewMode(viewMode === 'view' ? 'edit' : 'view')} 
         className={styles.viewModeButton}
       >
-        {viewMode === 'view' ? '✏️ Edit Mode' : '👁️ View Mode'}
+        {viewMode === 'view' ? 'Edit Mode' : 'View Mode'}
+      </button>
+    </div>
+  );
+}
+
+// API Filter Controls Component
+function APIFilterControls({ apiTitleFilter, setApiTitleFilter, apiSearchText, setApiSearchText, handleApiReset, apiTitles, isLoading }) {
+  return (
+    <div className={styles.filterControls}>
+      <div className={styles.filterGroup}>
+        <label htmlFor="api-title-filter">Filter by Title:</label>
+        <select 
+          id="api-title-filter"
+          value={apiTitleFilter} 
+          onChange={(e) => setApiTitleFilter(e.target.value)}
+          className={styles.filterDropdown}
+          disabled={isLoading}
+        >
+          <option value="">All Titles</option>
+          {apiTitles.map((title) => (
+            <option key={title} value={title}>{title}</option>
+          ))}
+        </select>
+      </div>
+      
+      <div className={styles.filterGroup}>
+        <label htmlFor="api-search-box">Search by Name:</label>
+        <input
+          id="api-search-box"
+          type="text"
+          value={apiSearchText}
+          onChange={(e) => setApiSearchText(e.target.value)}
+          placeholder="Type a name..."
+          className={styles.searchInput}
+          disabled={isLoading}
+        />
+      </div>
+      
+      <button onClick={handleApiReset} className={styles.resetButton} disabled={isLoading}>
+        Reset Filters
       </button>
     </div>
   );
@@ -459,7 +467,7 @@ function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, 
 
 // Main App Component
 export default function App() {
-  // State for filters
+  // State for filters (local profiles)
   const [roleFilter, setRoleFilter] = useState('');
   const [searchText, setSearchText] = useState('');
   
@@ -467,7 +475,7 @@ export default function App() {
   const [mode, setMode] = useState('light');
   const [viewMode, setViewMode] = useState('view');
   
-  // State for profiles
+  // State for local profiles
   const [profiles, setProfiles] = useState([
     {
       id: 1,
@@ -506,16 +514,95 @@ export default function App() {
       isFeatured: false
     }
   ]);
+
+  // State for API data
+  const [apiProfiles, setApiProfiles] = useState([]);
+  const [apiTitles, setApiTitles] = useState([]);
+  const [apiTitleFilter, setApiTitleFilter] = useState('');
+  const [apiSearchText, setApiSearchText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Fetch titles on component mount
+  useEffect(() => {
+    fetchTitles();
+  }, []);
+
+  // Fetch profiles when filters change
+  useEffect(() => {
+    fetchProfiles();
+  }, [apiTitleFilter, apiSearchText]);
+
+  // Fetch titles from API
+  const fetchTitles = async () => {
+    try {
+      const response = await fetch('https://web.ics.purdue.edu/~zong6/profile-app/get-titles.php');
+      const data = await response.json();
+      // API returns {titles: [...]}
+      setApiTitles(data.titles || []);
+    } catch (err) {
+      console.error('Error fetching titles:', err);
+      setError('Failed to load titles');
+    }
+  };
+
+  // Fetch profiles from API
+  const fetchProfiles = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      let url;
+      if (apiTitleFilter || apiSearchText) {
+        // Use filtered endpoint
+        url = `https://web.ics.purdue.edu/~zong6/profile-app/fetch-data-with-filter.php?title=${encodeURIComponent(apiTitleFilter)}&name=${encodeURIComponent(apiSearchText)}`;
+      } else {
+        // Use all data endpoint
+        url = 'https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php';
+      }
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      // Transform API data to match our card format
+      const transformedData = data.map((item, index) => ({
+        id: `api-${index}`,
+        name: item.name || 'Unknown',
+        role: item.title || 'No Title',
+        year: item.year || '',
+        major: item.major || '',
+        bio: item.bio || 'No bio available',
+        email: item.email || 'no-email@example.com',
+        status: 'active',
+        avatarUrl: item.image || 'https://via.placeholder.com/400',
+        isFeatured: false
+      }));
+      
+      setApiProfiles(transformedData);
+    } catch (err) {
+      console.error('Error fetching profiles:', err);
+      setError('Failed to load profiles');
+      setApiProfiles([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset API filters
+  const handleApiReset = () => {
+    setApiTitleFilter('');
+    setApiSearchText('');
+  };
   
   // Function to add new profile
   const handleAddProfile = (newProfile) => {
     setProfiles(prev => [...prev, newProfile]);
   };
   
-  // Get unique roles for dropdown
+  // Get unique roles for dropdown (local profiles)
   const uniqueRoles = [...new Set(profiles.map(profile => profile.role))];
   
-  // Filter profiles based on role and search text
+  // Filter local profiles based on role and search text
   const filteredProfiles = profiles.filter((profile) => {
     const matchesRole = roleFilter === '' || profile.role === roleFilter;
     const matchesSearch = searchText === '' || 
@@ -523,7 +610,7 @@ export default function App() {
     return matchesRole && matchesSearch;
   });
   
-  // Reset function
+  // Reset function for local profiles
   const handleReset = () => {
     setRoleFilter('');
     setSearchText('');
@@ -545,6 +632,7 @@ export default function App() {
       {/* Add Profile Form */}
       <AddProfileForm onAddProfile={handleAddProfile} mode={mode} />
       
+      {/* Local Profiles Section */}
       <FilterControls 
         roleFilter={roleFilter}
         setRoleFilter={setRoleFilter}
@@ -556,7 +644,7 @@ export default function App() {
         setViewMode={setViewMode}
       />
       
-      <Section title={viewMode === 'view' ? "Featured Profiles" : "Featured Profiles (Edit Mode)"}>
+      <Section title={viewMode === 'view' ? "My Profiles" : "My Profiles (Edit Mode)"}>
         <div className={styles.cardsContainer}>
           {filteredProfiles.length > 0 ? (
             filteredProfiles.map((profile) => (
@@ -578,6 +666,48 @@ export default function App() {
           ) : (
             <p className={styles.noResults}>
               No profiles match your filters. Try adjusting your search or role filter.
+            </p>
+          )}
+        </div>
+      </Section>
+
+      {/* API Profiles Section - NEW */}
+      <APIFilterControls 
+        apiTitleFilter={apiTitleFilter}
+        setApiTitleFilter={setApiTitleFilter}
+        apiSearchText={apiSearchText}
+        setApiSearchText={setApiSearchText}
+        handleApiReset={handleApiReset}
+        apiTitles={apiTitles}
+        isLoading={isLoading}
+      />
+
+      <Section title="Profiles from Database">
+        <div className={styles.cardsContainer}>
+          {isLoading ? (
+            <div className={styles.loadingMessage}>Loading profiles...</div>
+          ) : error ? (
+            <div className={styles.errorBox}>{error}</div>
+          ) : apiProfiles.length > 0 ? (
+            apiProfiles.map((profile) => (
+              <Card
+                key={profile.id}
+                name={profile.name}
+                role={profile.role}
+                year={profile.year}
+                major={profile.major}
+                bio={profile.bio}
+                email={profile.email}
+                status={profile.status}
+                avatarUrl={profile.avatarUrl}
+                isFeatured={profile.isFeatured}
+                viewMode="view"
+                mode={mode}
+              />
+            ))
+          ) : (
+            <p className={styles.noResults}>
+              No profiles found in database. Try adjusting your filters.
             </p>
           )}
         </div>
