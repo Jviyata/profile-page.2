@@ -546,6 +546,39 @@ body {
   color: #a0aec0;
 }
 
+/* Loading Message */
+.loadingMessage {
+  text-align: center;
+  color: #3182ce;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+  padding: 40px;
+  font-weight: 600;
+}
+
+.darkMode .loadingMessage {
+  color: #63b3ed;
+}
+
+/* Error Box */
+.errorBox {
+  text-align: center;
+  color: #e53e3e;
+  font-size: 1rem;
+  grid-column: 1 / -1;
+  padding: 20px;
+  background: #fff5f5;
+  border: 2px solid #fc8181;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.darkMode .errorBox {
+  background: #742a2a;
+  border-color: #e53e3e;
+  color: #feb2b2;
+}
+
 /* Form Section */
 .formSection {
   max-width: 700px;
