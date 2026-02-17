@@ -36,30 +36,24 @@ export default function AddProfileForm({ onSuccess }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      const res = await fetch("/api/profiles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name,
-          role: data.role,
-          email: data.email,
-          year: data.year,
-          major: data.major,
-          bio: data.bio,
-          status: data.status,
-          isFeatured: data.isFeatured,
-          avatarImage: data.avatarImage || null,
-        }),
-      });
-      
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error(error || "Failed to create profile");
-      }
-      
-      return res.json();
+      // Save to localStorage instead of making API call
+      const stored = localStorage.getItem("customProfiles");
+      const existing = stored ? JSON.parse(stored) : [];
+      const newProfile = {
+        id: Date.now(),
+        name: data.name,
+        role: data.role,
+        email: data.email,
+        year: data.year,
+        major: data.major,
+        bio: data.bio,
+        status: data.status,
+        isFeatured: data.isFeatured,
+        avatarImage: data.avatarImage || null,
+      };
+      existing.push(newProfile);
+      localStorage.setItem("customProfiles", JSON.stringify(existing));
+      return newProfile;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/profiles"] });

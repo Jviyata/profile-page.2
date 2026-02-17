@@ -22,6 +22,12 @@ export default function HomePage() {
     }
   }, []);
 
+  const handleDeleteProfile = (profileId) => {
+    const updatedProfiles = customProfiles.filter((p) => p.id !== profileId);
+    setCustomProfiles(updatedProfiles);
+    localStorage.setItem("customProfiles", JSON.stringify(updatedProfiles));
+  };
+
   const { data: profiles = [], isLoading, error } = useQuery({
     queryKey: ["/api/profiles"],
   });
@@ -63,7 +69,7 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="section-profiles">
             {filtered.map((profile) => (
-              <Card key={profile.id} profile={profile} />
+              <Card key={profile.id} profile={profile} onDelete={handleDeleteProfile} />
             ))}
           </div>
         )}

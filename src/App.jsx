@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ModeProvider, ModeContext } from "./contexts/ModeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { EditModeProvider } from "./contexts/EditModeContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
@@ -87,7 +88,9 @@ export default function App() {
         <BrowserRouter basename="/profile-page.2/">
           <ModeProvider>
             <NotificationProvider>
-              <MainApp />
+              <EditModeProvider>
+                <MainApp />
+              </EditModeProvider>
             </NotificationProvider>
           </ModeProvider>
         </BrowserRouter>
