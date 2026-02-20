@@ -13,7 +13,7 @@ export const mockProfiles = [
   },
   {
     id: 2,
-    name: "Julian Luzadder",
+    name: "Julian Luz",
     role: "Designer",
     year: "2025",
     major: "Graphic Design",

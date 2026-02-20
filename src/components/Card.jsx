@@ -1,6 +1,5 @@
+import { useRef, useLayoutEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import EditModeContext from "../contexts/EditModeContext";
 import styles from "../styles/card.module.css";
 import arikaImg from "../assets/arika-gibson.png";
 import julianImg from "../assets/julian-luzadder.png";
@@ -12,20 +11,31 @@ const avatarMap = {
   "Lyndie Lingg": lyndieImg,
 };
 
-export default function Card({ profile, onDelete }) {
+export default function Card({ profile }) {
   const avatarSrc = avatarMap[profile.name] || profile.avatarImage || profile.avatarUrl;
-  const { isEditing } = useContext(EditModeContext);
+  const cardRef = useRef(null);
+  const [cardWidth, setCardWidth] = useState(0);
 
-  const handleDelete = (e) => {
-    e.preventDefault();
-    if (onDelete && confirm(`Delete ${profile.name}?`)) {
-      onDelete(profile.id);
+  // Measure card width before browser paints
+  useLayoutEffect(() => {
+    if (cardRef.current) {
+      const width = cardRef.current.offsetWidth;
+      setCardWidth(width);
+      
+      // Apply dynamic styling based on width
+      if (width < 250) {
+        cardRef.current.style.fontSize = "0.875rem";
+      } else if (width > 350) {
+        cardRef.current.style.fontSize = "1.125rem";
+      } else {
+        cardRef.current.style.fontSize = "1rem";
+      }
     }
-  };
+  }, []);
 
   return (
     <Link to={`/profiles/${profile.id}`} className={styles.cardLink} data-testid={`card-profile-${profile.id}`}>
-      <div className={styles.card}>
+      <div ref={cardRef} className={styles.card}>
         <img
           src={avatarSrc}
           alt={profile.name}
@@ -36,12 +46,10 @@ export default function Card({ profile, onDelete }) {
         />
         <h3 className={styles.name}>{profile.name}</h3>
         <p className={styles.role}>{profile.role}</p>
-        {isEditing && (
-          <div className={styles.editButtons}>
-            <button onClick={handleDelete} className={styles.deleteButton}>
-              Delete
-            </button>
-          </div>
+        {cardWidth > 0 && (
+          <span className={styles.cardMeta} style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+            Width: {cardWidth}px
+          </span>
         )}
       </div>
     </Link>

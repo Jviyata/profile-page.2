@@ -1,6 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import EditModeContext from "../contexts/EditModeContext";
 import styles from "../styles/navbar.module.css";
 
 const navLinks = [
@@ -13,7 +11,6 @@ const navLinks = [
 export default function Navbar({ theme, setTheme }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isEditing, toggleEditMode } = useContext(EditModeContext);
 
   const handleNavClick = (path) => {
     navigate(path);
@@ -40,22 +37,13 @@ export default function Navbar({ theme, setTheme }) {
           </button>
         ))}
       </div>
-      <div className={styles.navButtons}>
-        <button
-          data-testid="button-toggle-edit"
-          onClick={toggleEditMode}
-          className={styles.editToggle}
-        >
-          {isEditing ? "Done" : "Edit Mode"}
-        </button>
-        <button
-          data-testid="button-toggle-mode"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className={styles.themeToggle}
-        >
-          {theme === "dark" ? "Light" : "Dark"}
-        </button>
-      </div>
+      <button
+        data-testid="button-toggle-mode"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        className={styles.themeToggle}
+      >
+        {theme === "dark" ? "Light" : "Dark"}
+      </button>
     </nav>
   );
 }

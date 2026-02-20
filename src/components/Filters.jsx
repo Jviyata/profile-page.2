@@ -1,6 +1,16 @@
+import { useRef, useEffect } from "react";
 import styles from "../styles/filter.module.css";
 
 export default function Filters({ roles, roleFilter, setRoleFilter, search, setSearch }) {
+  const searchInputRef = useRef(null);
+
+  // Auto-focus search input when component mounts
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={styles.filters} data-testid="section-filters">
       <label className={styles.label}>
@@ -19,6 +29,7 @@ export default function Filters({ roles, roleFilter, setRoleFilter, search, setS
       <label className={styles.label}>
         Search a name
         <input
+          ref={searchInputRef}
           data-testid="input-search"
           type="text"
           value={search}

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useReducer, useContext, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NotificationContext } from "../contexts/NotificationContext";
 import styles from "../styles/addProfileForm.module.css";
@@ -16,10 +16,47 @@ const validateForm = (form) => {
   return errors;
 };
 
-export default function AddProfileForm({ onSuccess }) {
-  const qc = useQueryClient();
-  const { notification, showNotification } = useContext(NotificationContext);
-  const [form, setForm] = useState({
+// Reducer for managing form state
+const formReducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_FIELD":
+      return {
+        ...state,
+        form: { ...state.form, [action.field]: action.value }
+      };
+    case "SET_ERRORS":
+      return { ...state, errors: action.errors };
+    case "SET_AVATAR":
+      return {
+        ...state,
+        form: { ...state.form, avatarImage: action.image },
+        avatarPreview: action.preview,
+        fileName: action.fileName
+      };
+    case "RESET_FORM":
+      return {
+        form: {
+          name: "", 
+          role: "", 
+          bio: "", 
+          email: "", 
+          avatarImage: null, 
+          year: "2026",
+          major: "General",
+          status: "active", 
+          isFeatured: false,
+        },
+        errors: {},
+        avatarPreview: null,
+        fileName: "No file chosen"
+      };
+    default:
+      return state;
+  }
+};
+
+const initialState = {
+  form: {
     name: "", 
     role: "", 
     bio: "", 
@@ -29,10 +66,17 @@ export default function AddProfileForm({ onSuccess }) {
     major: "General",
     status: "active", 
     isFeatured: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [avatarPreview, setAvatarPreview] = useState(null);
-  const [fileName, setFileName] = useState("No file chosen");
+  },
+  errors: {},
+  avatarPreview: null,
+  fileName: "No file chosen"
+};
+
+export default function AddProfileForm({ onSuccess }) {
+  const qc = useQueryClient();
+  const { notification, showNotification } = useContext(NotificationContext);
+  const [state, dispatch] = useReducer(formReducer, initialState);
+  const fileInputRef = useRef(null);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -58,10 +102,10 @@ export default function AddProfileForm({ onSuccess }) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/profiles"] });
       showNotification("Profile created successfully!", "success", 2000);
-      setForm({ name: "", role: "", bio: "", email: "", avatarImage: null, year: "2026", major: "General", status: "active", isFeatured: false });
-      setAvatarPreview(null);
-      setFileName("No file chosen");
-      setErrors({});
+      dispatch({ type: "RESET_FORM" });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       setTimeout(() => {
         if (onSuccess) onSuccess();
       }, 2000);
@@ -75,11 +119,14 @@ export default function AddProfileForm({ onSuccess }) {
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setForm({ ...form, avatarImage: reader.result });
-        setAvatarPreview(reader.result);
+        dispatch({
+          type: "SET_AVATAR",
+          image: reader.result,
+          preview: reader.result,
+          fileName: file.name
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -87,13 +134,13 @@ export default function AddProfileForm({ onSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validateForm(form);
+    const validationErrors = validateForm(state.form);
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      dispatch({ type: "SET_ERRORS", errors: validationErrors });
       return;
     }
-    setErrors({});
-    mutation.mutate(form);
+    dispatch({ type: "SET_ERRORS", errors: {} });
+    mutation.mutate(state.form);
   };
 
   return (
@@ -114,10 +161,10 @@ export default function AddProfileForm({ onSuccess }) {
           data-testid="input-name" 
           className={styles.input} 
           placeholder="Enter full name" 
-          value={form.name} 
-          onChange={(e) => setForm({ ...form, name: e.target.value })} 
+          value={state.form.name} 
+          onChange={(e) => dispatch({ type: "UPDATE_FIELD", field: "name", value: e.target.value })} 
         />
-        {errors.name && <p className={styles.error}>{errors.name}</p>}
+        {state.errors.name && <p className={styles.error}>{state.errors.name}</p>}
       </div>
 
       <div className={styles.formGroup}>
@@ -127,10 +174,10 @@ export default function AddProfileForm({ onSuccess }) {
           data-testid="input-role" 
           className={styles.input} 
           placeholder="e.g. Developer, Designer" 
-          value={form.role} 
-          onChange={(e) => setForm({ ...form, role: e.target.value })} 
+          value={state.form.role} 
+          onChange={(e) => dispatch({ type: "UPDATE_FIELD", field: "role", value: e.target.value })} 
         />
-        {errors.role && <p className={styles.error}>{errors.role}</p>}
+        {state.errors.role && <p className={styles.error}>{state.errors.role}</p>}
       </div>
 
       <div className={styles.formGroup}>
@@ -141,10 +188,10 @@ export default function AddProfileForm({ onSuccess }) {
           className={styles.input} 
           type="email" 
           placeholder="your.email@example.com" 
-          value={form.email} 
-          onChange={(e) => setForm({ ...form, email: e.target.value })} 
+          value={state.form.email} 
+          onChange={(e) => dispatch({ type: "UPDATE_FIELD", field: "email", value: e.target.value })} 
         />
-        {errors.email && <p className={styles.error}>{errors.email}</p>}
+        {state.errors.email && <p className={styles.error}>{state.errors.email}</p>}
       </div>
 
       <div className={styles.formGroup}>
@@ -154,10 +201,10 @@ export default function AddProfileForm({ onSuccess }) {
           data-testid="input-bio" 
           className={styles.textarea} 
           placeholder="Tell us about yourself..." 
-          value={form.bio} 
-          onChange={(e) => setForm({ ...form, bio: e.target.value })} 
+          value={state.form.bio} 
+          onChange={(e) => dispatch({ type: "UPDATE_FIELD", field: "bio", value: e.target.value })} 
         />
-        {errors.bio && <p className={styles.error}>{errors.bio}</p>}
+        {state.errors.bio && <p className={styles.error}>{state.errors.bio}</p>}
       </div>
 
       <div className={styles.formGroup}>
@@ -169,13 +216,14 @@ export default function AddProfileForm({ onSuccess }) {
             className={styles.fileInput} 
             type="file" 
             accept="image/*"
+            ref={fileInputRef}
             onChange={handleImageChange}
           />
-          <span className={styles.fileName}>{fileName}</span>
+          <span className={styles.fileName}>{state.fileName}</span>
         </div>
-        {avatarPreview && (
+        {state.avatarPreview && (
           <div className={styles.previewContainer}>
-            <img src={avatarPreview} alt="Preview" className={styles.preview} />
+            <img src={state.avatarPreview} alt="Preview" className={styles.preview} />
           </div>
         )}
       </div>
