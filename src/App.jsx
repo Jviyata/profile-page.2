@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import styles from './App.module.css';
 
+// Lazy load the AddProfileForm component
+const AddProfileForm = lazy(() => import('./components/AddProfileForm'));
+
 // Header Component
-function Header({ mode, toggleMode }) {
+const Header = React.memo(function Header({ mode, toggleMode }) {
   const siteName = "Profile Gallery";
   const tagline = mode === 'light' ? "Browse the profiles below:" : "Discover profiles in dark mode";
   
@@ -15,10 +18,10 @@ function Header({ mode, toggleMode }) {
       </button>
     </header>
   );
-}
+});
 
 // Introduction Component
-function Introduction({ viewMode }) {
+const Introduction = React.memo(function Introduction({ viewMode }) {
   const name = "Vruta";
   const bio = "Welcome to my profile gallery!";
   const email = "vruta@purdue.brightspace.com";
@@ -45,294 +48,10 @@ function Introduction({ viewMode }) {
       )}
     </section>
   );
-}
-
-// Add Profile Form Component
-function AddProfileForm({ onAddProfile, mode }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: '',
-    bio: '',
-    avatarUrl: '',
-    year: '',
-    major: ''
-  });
-
-  const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    
-    if (successMessage) {
-      setSuccessMessage('');
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    } else if (formData.name.trim().length > 50) {
-      newErrors.name = 'Name must be less than 50 characters';
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.role.trim()) {
-      newErrors.role = 'Title is required';
-    } else if (formData.role.trim().length < 2) {
-      newErrors.role = 'Title must be at least 2 characters';
-    }
-
-    if (!formData.bio.trim()) {
-      newErrors.bio = 'Bio is required';
-    } else if (formData.bio.trim().length < 10) {
-      newErrors.bio = 'Bio must be at least 10 characters';
-    } else if (formData.bio.trim().length > 200) {
-      newErrors.bio = 'Bio must be less than 200 characters';
-    }
-
-    if (!formData.avatarUrl.trim()) {
-      newErrors.avatarUrl = 'Image URL is required';
-    } else {
-      try {
-        new URL(formData.avatarUrl);
-      } catch {
-        newErrors.avatarUrl = 'Please enter a valid URL';
-      }
-    }
-
-    if (formData.year && (formData.year < 1900 || formData.year > 2100)) {
-      newErrors.year = 'Please enter a valid year';
-    }
-
-    if (formData.major && formData.major.trim().length > 50) {
-      newErrors.major = 'Major must be less than 50 characters';
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    const newErrors = validateForm();
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setSuccessMessage('');
-      return;
-    }
-
-    const newProfile = {
-      id: Date.now(),
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      role: formData.role.trim(),
-      bio: formData.bio.trim(),
-      avatarUrl: formData.avatarUrl.trim(),
-      year: formData.year || '',
-      major: formData.major.trim() || '',
-      status: 'active',
-      isFeatured: false
-    };
-
-    onAddProfile(newProfile);
-    setSuccessMessage('Profile added successfully!');
-
-    setFormData({
-      name: '',
-      email: '',
-      role: '',
-      bio: '',
-      avatarUrl: '',
-      year: '',
-      major: ''
-    });
-    
-    setErrors({});
-
-    setTimeout(() => {
-      setSuccessMessage('');
-    }, 5000);
-  };
-
-  return (
-    <section className={styles.formSection}>
-      <h2 className={styles.formTitle}>Add New Profile</h2>
-      
-      {successMessage && (
-        <div className={styles.successMessage}>
-          {successMessage}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className={styles.profileForm}>
-        <div className={styles.formGroup}>
-          <label htmlFor="name" className={styles.formLabel}>
-            Name <span className={styles.required}>*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.name ? styles.inputError : ''}`}
-            placeholder="Enter full name"
-          />
-          {errors.name && (
-            <span className={styles.errorMessage}>{errors.name}</span>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="email" className={styles.formLabel}>
-            Email <span className={styles.required}>*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.email ? styles.inputError : ''}`}
-            placeholder="email@example.com"
-          />
-          {errors.email && (
-            <span className={styles.errorMessage}>{errors.email}</span>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="role" className={styles.formLabel}>
-            Title <span className={styles.required}>*</span>
-          </label>
-          <input
-            type="text"
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.role ? styles.inputError : ''}`}
-            placeholder="e.g., Developer, Designer, Data Scientist"
-          />
-          {errors.role && (
-            <span className={styles.errorMessage}>{errors.role}</span>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="bio" className={styles.formLabel}>
-            Bio <span className={styles.required}>*</span>
-          </label>
-          <textarea
-            id="bio"
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            className={`${styles.formTextarea} ${errors.bio ? styles.inputError : ''}`}
-            placeholder="Write a brief bio (10-200 characters)"
-            rows="4"
-          />
-          <div className={styles.charCount}>
-            {formData.bio.length}/200 characters
-          </div>
-          {errors.bio && (
-            <span className={styles.errorMessage}>{errors.bio}</span>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="avatarUrl" className={styles.formLabel}>
-            Image URL <span className={styles.required}>*</span>
-          </label>
-          <input
-            type="url"
-            id="avatarUrl"
-            name="avatarUrl"
-            value={formData.avatarUrl}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.avatarUrl ? styles.inputError : ''}`}
-            placeholder="https://example.com/image.jpg"
-          />
-          {errors.avatarUrl && (
-            <span className={styles.errorMessage}>{errors.avatarUrl}</span>
-          )}
-          <small className={styles.fieldHint}>
-            Use services like Unsplash, Pexels, or upload to Imgur
-          </small>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="year" className={styles.formLabel}>
-            Graduation Year <span className={styles.optional}>(Optional)</span>
-          </label>
-          <input
-            type="number"
-            id="year"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.year ? styles.inputError : ''}`}
-            placeholder="2025"
-            min="1900"
-            max="2100"
-          />
-          {errors.year && (
-            <span className={styles.errorMessage}>{errors.year}</span>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="major" className={styles.formLabel}>
-            Major <span className={styles.optional}>(Optional)</span>
-          </label>
-          <input
-            type="text"
-            id="major"
-            name="major"
-            value={formData.major}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.major ? styles.inputError : ''}`}
-            placeholder="e.g., Computer Science"
-          />
-          {errors.major && (
-            <span className={styles.errorMessage}>{errors.major}</span>
-          )}
-        </div>
-
-        <button type="submit" className={styles.submitButton}>
-          Add Profile
-        </button>
-      </form>
-    </section>
-  );
-}
+});
 
 // Section Wrapper Component
-function Section({ title, children }) {
+const Section = React.memo(function Section({ title, children }) {
   return (
     <section className={styles.sectionWrapper}>
       {title && <h2 className={styles.sectionTitle}>{title}</h2>}
@@ -341,10 +60,10 @@ function Section({ title, children }) {
       </div>
     </section>
   );
-}
+});
 
 // Card Component
-function Card({ name, role, bio, email, status, avatarUrl, year, major, isFeatured, viewMode, mode }) {
+const Card = React.memo(function Card({ name, role, bio, email, status, avatarUrl, year, major, isFeatured, viewMode, mode }) {
   const cardClasses = `${styles.profileCard} ${isFeatured ? styles.featuredCard : ''} ${mode === 'dark' ? styles.darkCard : ''}`;
   const statusClass = status === "active" ? styles.statusActive : styles.statusInactive;
   
@@ -378,10 +97,10 @@ function Card({ name, role, bio, email, status, avatarUrl, year, major, isFeatur
       <span className={statusClass}>{status}</span>
     </div>
   );
-}
+});
 
 // Filter Controls Component
-function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, handleReset, roles, viewMode, setViewMode }) {
+const FilterControls = React.memo(function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, handleReset, roles, viewMode, setViewMode }) {
   return (
     <div className={styles.filterControls}>
       <div className={styles.filterGroup}>
@@ -423,10 +142,10 @@ function FilterControls({ roleFilter, setRoleFilter, searchText, setSearchText, 
       </button>
     </div>
   );
-}
+});
 
 // API Filter Controls Component
-function APIFilterControls({ apiTitleFilter, setApiTitleFilter, apiSearchText, setApiSearchText, handleApiReset, apiTitles, isLoading }) {
+const APIFilterControls = React.memo(function APIFilterControls({ apiTitleFilter, setApiTitleFilter, apiSearchText, setApiSearchText, handleApiReset, apiTitles, isLoading }) {
   return (
     <div className={styles.filterControls}>
       <div className={styles.filterGroup}>
@@ -463,7 +182,43 @@ function APIFilterControls({ apiTitleFilter, setApiTitleFilter, apiSearchText, s
       </button>
     </div>
   );
-}
+});
+
+// Cards Container Component - new sub-component
+const CardsContainer = React.memo(function CardsContainer({ profiles, viewMode, mode, isLoading, error, noResultsMessage }) {
+  if (isLoading) {
+    return <div className={styles.loadingMessage}>Loading profiles...</div>;
+  }
+  
+  if (error) {
+    return <div className={styles.errorBox}>{error}</div>;
+  }
+  
+  if (profiles.length === 0) {
+    return <p className={styles.noResults}>{noResultsMessage}</p>;
+  }
+  
+  return (
+    <div className={styles.cardsContainer}>
+      {profiles.map((profile) => (
+        <Card
+          key={profile.id}
+          name={profile.name}
+          role={profile.role}
+          year={profile.year}
+          major={profile.major}
+          bio={profile.bio}
+          email={profile.email}
+          status={profile.status}
+          avatarUrl={profile.avatarUrl}
+          isFeatured={profile.isFeatured}
+          viewMode={viewMode}
+          mode={mode}
+        />
+      ))}
+    </div>
+  );
+});
 
 // Main App Component
 export default function App() {
@@ -534,39 +289,34 @@ export default function App() {
   }, [apiTitleFilter, apiSearchText]);
 
   // Fetch titles from API
-  const fetchTitles = async () => {
+  const fetchTitles = useCallback(async () => {
     try {
       const response = await fetch('https://web.ics.purdue.edu/~zong6/profile-app/get-titles.php');
       const data = await response.json();
-      // API returns {titles: [...]}
       setApiTitles(data.titles || []);
     } catch (err) {
       console.error('Error fetching titles:', err);
       setError('Failed to load titles');
     }
-  };
+  }, []);
 
   // Fetch profiles from API
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
       let url;
       if (apiTitleFilter || apiSearchText) {
-        // Use filtered endpoint
         url = `https://web.ics.purdue.edu/~zong6/profile-app/fetch-data-with-filter.php?title=${encodeURIComponent(apiTitleFilter)}&name=${encodeURIComponent(apiSearchText)}`;
       } else {
-        // Use all data endpoint
         url = 'https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php';
       }
       
       const response = await fetch(url);
       const data = await response.json();
       
-      // Transform API data to match our card format
       const transformedData = data.map((item, index) => {
-        // Convert name to filename format: "Arika Gibson" -> "Arika_Gibson.png"
         const imageFilename = item.name ? `/${item.name.replace(/\s+/g, '_')}.png` : null;
         
         return {
@@ -578,7 +328,6 @@ export default function App() {
           bio: item.bio || 'No bio available',
           email: item.email || 'no-email@example.com',
           status: 'active',
-          // Use API image if available, otherwise use name-based filename, otherwise placeholder
           avatarUrl: item.image || imageFilename || 'https://via.placeholder.com/400',
           isFeatured: false
         };
@@ -592,131 +341,121 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiTitleFilter, apiSearchText]);
 
-  // Reset API filters
-  const handleApiReset = () => {
-    setApiTitleFilter('');
-    setApiSearchText('');
-  };
-  
-  // Function to add new profile
-  const handleAddProfile = (newProfile) => {
-    setProfiles(prev => [...prev, newProfile]);
-  };
-  
-  // Get unique roles for dropdown (local profiles)
-  const uniqueRoles = [...new Set(profiles.map(profile => profile.role))];
-  
-  // Filter local profiles based on role and search text
-  const filteredProfiles = profiles.filter((profile) => {
-    const matchesRole = roleFilter === '' || profile.role === roleFilter;
-    const matchesSearch = searchText === '' || 
-      profile.name.toLowerCase().includes(searchText.toLowerCase());
-    return matchesRole && matchesSearch;
-  });
-  
-  // Reset function for local profiles
-  const handleReset = () => {
+  // Memoized callbacks for filter controls
+  const handleReset = useCallback(() => {
     setRoleFilter('');
     setSearchText('');
-  };
-  
-  // Toggle mode function
-  const toggleMode = () => {
+  }, []);
+
+  const handleApiReset = useCallback(() => {
+    setApiTitleFilter('');
+    setApiSearchText('');
+  }, []);
+
+  const toggleMode = useCallback(() => {
     setMode(mode === 'light' ? 'dark' : 'light');
-  };
-  
-  // Dynamic class for app container based on mode
-  const appClass = mode === 'dark' ? `${styles.appContainer} ${styles.darkMode}` : styles.appContainer;
+  }, [mode]);
+
+  const handleAddProfile = useCallback((newProfile) => {
+    setProfiles(prev => [...prev, newProfile]);
+  }, []);
+
+  const setRoleFilterCallback = useCallback((value) => {
+    setRoleFilter(value);
+  }, []);
+
+  const setSearchTextCallback = useCallback((value) => {
+    setSearchText(value);
+  }, []);
+
+  const setViewModeCallback = useCallback((value) => {
+    setViewMode(value);
+  }, []);
+
+  const setApiTitleFilterCallback = useCallback((value) => {
+    setApiTitleFilter(value);
+  }, []);
+
+  const setApiSearchTextCallback = useCallback((value) => {
+    setApiSearchText(value);
+  }, []);
+
+  // Memoized derived data
+  const uniqueRoles = useMemo(() => 
+    [...new Set(profiles.map(profile => profile.role))], 
+    [profiles]
+  );
+
+  const filteredProfiles = useMemo(() => 
+    profiles.filter((profile) => {
+      const matchesRole = roleFilter === '' || profile.role === roleFilter;
+      const matchesSearch = searchText === '' || 
+        profile.name.toLowerCase().includes(searchText.toLowerCase());
+      return matchesRole && matchesSearch;
+    }), 
+    [profiles, roleFilter, searchText]
+  );
+
+  const appClass = useMemo(() => 
+    mode === 'dark' ? `${styles.appContainer} ${styles.darkMode}` : styles.appContainer,
+    [mode]
+  );
   
   return (
     <div className={appClass}>
       <Header mode={mode} toggleMode={toggleMode} />
       <Introduction viewMode={viewMode} />
       
-      {/* Add Profile Form */}
-      <AddProfileForm onAddProfile={handleAddProfile} mode={mode} />
+      {/* Add Profile Form - Lazy Loaded */}
+      <Suspense fallback={<div className={styles.loadingMessage}>Loading form...</div>}>
+        <AddProfileForm onAddProfile={handleAddProfile} mode={mode} />
+      </Suspense>
       
       {/* Local Profiles Section */}
       <FilterControls 
         roleFilter={roleFilter}
-        setRoleFilter={setRoleFilter}
+        setRoleFilter={setRoleFilterCallback}
         searchText={searchText}
-        setSearchText={setSearchText}
+        setSearchText={setSearchTextCallback}
         handleReset={handleReset}
         roles={uniqueRoles}
         viewMode={viewMode}
-        setViewMode={setViewMode}
+        setViewMode={setViewModeCallback}
       />
       
       <Section title={viewMode === 'view' ? "My Profiles" : "My Profiles (Edit Mode)"}>
-        <div className={styles.cardsContainer}>
-          {filteredProfiles.length > 0 ? (
-            filteredProfiles.map((profile) => (
-              <Card
-                key={profile.id}
-                name={profile.name}
-                role={profile.role}
-                year={profile.year}
-                major={profile.major}
-                bio={profile.bio}
-                email={profile.email}
-                status={profile.status}
-                avatarUrl={profile.avatarUrl}
-                isFeatured={profile.isFeatured}
-                viewMode={viewMode}
-                mode={mode}
-              />
-            ))
-          ) : (
-            <p className={styles.noResults}>
-              No profiles match your filters. Try adjusting your search or role filter.
-            </p>
-          )}
-        </div>
+        <CardsContainer
+          profiles={filteredProfiles}
+          viewMode={viewMode}
+          mode={mode}
+          isLoading={false}
+          error={null}
+          noResultsMessage="No profiles match your filters. Try adjusting your search or role filter."
+        />
       </Section>
 
-      {/* API Profiles Section - NEW */}
+      {/* API Profiles Section */}
       <APIFilterControls 
         apiTitleFilter={apiTitleFilter}
-        setApiTitleFilter={setApiTitleFilter}
+        setApiTitleFilter={setApiTitleFilterCallback}
         apiSearchText={apiSearchText}
-        setApiSearchText={setApiSearchText}
+        setApiSearchText={setApiSearchTextCallback}
         handleApiReset={handleApiReset}
         apiTitles={apiTitles}
         isLoading={isLoading}
       />
 
       <Section title="Profiles from Database">
-        <div className={styles.cardsContainer}>
-          {isLoading ? (
-            <div className={styles.loadingMessage}>Loading profiles...</div>
-          ) : error ? (
-            <div className={styles.errorBox}>{error}</div>
-          ) : apiProfiles.length > 0 ? (
-            apiProfiles.map((profile) => (
-              <Card
-                key={profile.id}
-                name={profile.name}
-                role={profile.role}
-                year={profile.year}
-                major={profile.major}
-                bio={profile.bio}
-                email={profile.email}
-                status={profile.status}
-                avatarUrl={profile.avatarUrl}
-                isFeatured={profile.isFeatured}
-                viewMode="view"
-                mode={mode}
-              />
-            ))
-          ) : (
-            <p className={styles.noResults}>
-              No profiles found in database. Try adjusting your filters.
-            </p>
-          )}
-        </div>
+        <CardsContainer
+          profiles={apiProfiles}
+          viewMode="view"
+          mode={mode}
+          isLoading={isLoading}
+          error={error}
+          noResultsMessage="No profiles found in database. Try adjusting your filters."
+        />
       </Section>
     </div>
   );
