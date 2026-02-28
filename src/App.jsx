@@ -8,6 +8,11 @@ import styles from './App.module.css';
 import Navbar from './components/Navbar';
 import ModeContext, { ModeProvider } from './context/ModeContext';
 
+// Import assets
+import girl2Img from './assets/girl2.png';
+import boyImg from './assets/boy.png';
+import girlImg from './assets/girl.png';
+
 // Lazy load pages
 const HomePage = lazy(() => import('./pages/HomePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
@@ -43,7 +48,7 @@ function AppContent() {
       bio: "Full-stack developer with 5 years of experience building web applications.",
       email: "arika.gibson@example.com",
       status: "active",
-      avatarUrl: "/assets/girl2.png",
+      avatarUrl: girl2Img,
       isFeatured: true
     },
     {
@@ -55,7 +60,7 @@ function AppContent() {
       bio: "Creative designer specializing in user interface and experience design.",
       email: "julian.luzzader@example.com",
       status: "active",
-      avatarUrl: "/assets/boy.png",
+      avatarUrl: boyImg,
       isFeatured: false
     },
     {
@@ -67,7 +72,7 @@ function AppContent() {
       bio: "Data scientist passionate about machine learning and artificial intelligence.",
       email: "viyata.ruta@example.com",
       status: "active",
-      avatarUrl: "/assets/girl.png",
+      avatarUrl: girlImg,
       isFeatured: false
     }
   ]);
@@ -82,7 +87,7 @@ function AppContent() {
       bio: "Full-stack developer with 5 years of experience building web applications.",
       email: "arika.gibson@example.com",
       status: "active",
-      avatarUrl: "/assets/girl2.png",
+      avatarUrl: girl2Img,
       isFeatured: false
     },
     {
@@ -94,7 +99,7 @@ function AppContent() {
       bio: "Creative designer specializing in user interface and experience design.",
       email: "julian.luzzader@example.com",
       status: "active",
-      avatarUrl: "/assets/boy.png",
+      avatarUrl: boyImg,
       isFeatured: false
     },
     {
@@ -106,7 +111,7 @@ function AppContent() {
       bio: "Data scientist passionate about machine learning and artificial intelligence.",
       email: "viyata.ruta@example.com",
       status: "active",
-      avatarUrl: "/assets/girl.png",
+      avatarUrl: girlImg,
       isFeatured: false
     }
   ]);
@@ -291,7 +296,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/profile-page.2">
       <ModeProvider>
         <AppContent />
       </ModeProvider>
