@@ -14,6 +14,7 @@ function AddProfileForm({ onAddProfile, mode }) {
 
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -34,6 +35,43 @@ function AddProfileForm({ onAddProfile, mode }) {
     }
   }, [errors, successMessage]);
 
+  const handleImageChange = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors(prev => ({
+          ...prev,
+          avatar: 'File size must be less than 5MB'
+        }));
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        setErrors(prev => ({
+          ...prev,
+          avatar: 'Please upload a valid image file'
+        }));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+        setFormData(prev => ({
+          ...prev,
+          avatarUrl: reader.result
+        }));
+        setErrors(prev => ({
+          ...prev,
+          avatar: ''
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   const validateForm = useCallback(() => {
     const newErrors = {};
 
@@ -41,8 +79,6 @@ function AddProfileForm({ onAddProfile, mode }) {
       newErrors.name = 'Name is required';
     } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters';
-    } else if (formData.name.trim().length > 50) {
-      newErrors.name = 'Name must be less than 50 characters';
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,34 +90,14 @@ function AddProfileForm({ onAddProfile, mode }) {
 
     if (!formData.role.trim()) {
       newErrors.role = 'Title is required';
-    } else if (formData.role.trim().length < 2) {
-      newErrors.role = 'Title must be at least 2 characters';
     }
 
     if (!formData.bio.trim()) {
       newErrors.bio = 'Bio is required';
-    } else if (formData.bio.trim().length < 10) {
-      newErrors.bio = 'Bio must be at least 10 characters';
-    } else if (formData.bio.trim().length > 200) {
-      newErrors.bio = 'Bio must be less than 200 characters';
     }
 
-    if (!formData.avatarUrl.trim()) {
-      newErrors.avatarUrl = 'Image URL is required';
-    } else {
-      try {
-        new URL(formData.avatarUrl);
-      } catch {
-        newErrors.avatarUrl = 'Please enter a valid URL';
-      }
-    }
-
-    if (formData.year && (formData.year < 1900 || formData.year > 2100)) {
-      newErrors.year = 'Please enter a valid year';
-    }
-
-    if (formData.major && formData.major.trim().length > 50) {
-      newErrors.major = 'Major must be less than 50 characters';
+    if (!formData.avatarUrl) {
+      newErrors.avatar = 'Image is required';
     }
 
     return newErrors;
@@ -104,7 +120,7 @@ function AddProfileForm({ onAddProfile, mode }) {
       email: formData.email.trim(),
       role: formData.role.trim(),
       bio: formData.bio.trim(),
-      avatarUrl: formData.avatarUrl.trim(),
+      avatarUrl: formData.avatarUrl,
       year: formData.year || '',
       major: formData.major.trim() || '',
       status: 'active',
@@ -124,6 +140,7 @@ function AddProfileForm({ onAddProfile, mode }) {
       major: ''
     });
     
+    setImagePreview(null);
     setErrors({});
 
     setTimeout(() => {
@@ -132,9 +149,7 @@ function AddProfileForm({ onAddProfile, mode }) {
   }, [formData, validateForm, onAddProfile]);
 
   return (
-    <section className={styles.formSection}>
-      <h2 className={styles.formTitle}>Add New Profile</h2>
-      
+    <div className={styles.filterControls}>
       {successMessage && (
         <div className={styles.successMessage}>
           {successMessage}
@@ -143,144 +158,110 @@ function AddProfileForm({ onAddProfile, mode }) {
 
       <form onSubmit={handleSubmit} className={styles.profileForm}>
         <div className={styles.formGroup}>
-          <label htmlFor="name" className={styles.formLabel}>
-            Name <span className={styles.required}>*</span>
-          </label>
+          <label htmlFor="name">Name</label>
           <input
             type="text"
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.name ? styles.inputError : ''}`}
             placeholder="Enter full name"
+            className={styles.searchInput}
           />
-          {errors.name && (
-            <span className={styles.errorMessage}>{errors.name}</span>
-          )}
+          {errors.name && <span className={styles.errorMessage}>{errors.name}</span>}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="email" className={styles.formLabel}>
-            Email <span className={styles.required}>*</span>
-          </label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.email ? styles.inputError : ''}`}
             placeholder="email@example.com"
+            className={styles.searchInput}
           />
-          {errors.email && (
-            <span className={styles.errorMessage}>{errors.email}</span>
-          )}
+          {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="role" className={styles.formLabel}>
-            Title <span className={styles.required}>*</span>
-          </label>
+          <label htmlFor="role">Title</label>
           <input
             type="text"
             id="role"
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.role ? styles.inputError : ''}`}
-            placeholder="e.g., Developer, Designer, Data Scientist"
+            placeholder="e.g., Developer"
+            className={styles.searchInput}
           />
-          {errors.role && (
-            <span className={styles.errorMessage}>{errors.role}</span>
-          )}
+          {errors.role && <span className={styles.errorMessage}>{errors.role}</span>}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="bio" className={styles.formLabel}>
-            Bio <span className={styles.required}>*</span>
-          </label>
-          <textarea
+          <label htmlFor="bio">Bio</label>
+          <input
+            type="text"
             id="bio"
             name="bio"
             value={formData.bio}
             onChange={handleChange}
-            className={`${styles.formTextarea} ${errors.bio ? styles.inputError : ''}`}
-            placeholder="Write a brief bio (10-200 characters)"
-            rows="4"
+            placeholder="Write a brief bio"
+            className={styles.searchInput}
           />
-          <div className={styles.charCount}>
-            {formData.bio.length}/200 characters
-          </div>
-          {errors.bio && (
-            <span className={styles.errorMessage}>{errors.bio}</span>
-          )}
+          {errors.bio && <span className={styles.errorMessage}>{errors.bio}</span>}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="avatarUrl" className={styles.formLabel}>
-            Image URL <span className={styles.required}>*</span>
-          </label>
+          <label htmlFor="avatar">Upload Image</label>
           <input
-            type="url"
-            id="avatarUrl"
-            name="avatarUrl"
-            value={formData.avatarUrl}
-            onChange={handleChange}
-            className={`${styles.formInput} ${errors.avatarUrl ? styles.inputError : ''}`}
-            placeholder="https://example.com/image.jpg"
+            type="file"
+            id="avatar"
+            accept="image/*"
+            onChange={handleImageChange}
+            className={styles.fileInput}
           />
-          {errors.avatarUrl && (
-            <span className={styles.errorMessage}>{errors.avatarUrl}</span>
+          {errors.avatar && <span className={styles.errorMessage}>{errors.avatar}</span>}
+          {imagePreview && (
+            <div className={styles.imagePreview}>
+              <img src={imagePreview} alt="Preview" className={styles.previewImg} />
+              <p className={styles.previewLabel}>Image selected</p>
+            </div>
           )}
-          <small className={styles.fieldHint}>
-            Use services like Unsplash, Pexels, or upload to Imgur
-          </small>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="year" className={styles.formLabel}>
-            Graduation Year <span className={styles.optional}>(Optional)</span>
-          </label>
+          <label htmlFor="year">Graduation Year</label>
           <input
             type="number"
             id="year"
             name="year"
             value={formData.year}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.year ? styles.inputError : ''}`}
             placeholder="2025"
-            min="1900"
-            max="2100"
+            className={styles.searchInput}
           />
-          {errors.year && (
-            <span className={styles.errorMessage}>{errors.year}</span>
-          )}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="major" className={styles.formLabel}>
-            Major <span className={styles.optional}>(Optional)</span>
-          </label>
+          <label htmlFor="major">Major</label>
           <input
             type="text"
             id="major"
             name="major"
             value={formData.major}
             onChange={handleChange}
-            className={`${styles.formInput} ${errors.major ? styles.inputError : ''}`}
             placeholder="e.g., Computer Science"
+            className={styles.searchInput}
           />
-          {errors.major && (
-            <span className={styles.errorMessage}>{errors.major}</span>
-          )}
         </div>
 
-        <button type="submit" className={styles.submitButton}>
+        <button type="submit" className={styles.resetButton}>
           Add Profile
         </button>
       </form>
-    </section>
+    </div>
   );
 }
 
