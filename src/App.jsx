@@ -43,7 +43,7 @@ function AppContent() {
       bio: "Full-stack developer with 5 years of experience building web applications.",
       email: "arika.gibson@example.com",
       status: "active",
-      avatarUrl: "/src/assets/girl2.png",
+      avatarUrl: "/assets/girl2.png",
       isFeatured: true
     },
     {
@@ -55,7 +55,7 @@ function AppContent() {
       bio: "Creative designer specializing in user interface and experience design.",
       email: "julian.luzzader@example.com",
       status: "active",
-      avatarUrl: "/src/assets/boy.png",
+      avatarUrl: "/assets/boy.png",
       isFeatured: false
     },
     {
@@ -67,7 +67,7 @@ function AppContent() {
       bio: "Data scientist passionate about machine learning and artificial intelligence.",
       email: "viyata.ruta@example.com",
       status: "active",
-      avatarUrl: "/src/assets/girl.png",
+      avatarUrl: "/assets/girl.png",
       isFeatured: false
     }
   ]);
@@ -82,7 +82,7 @@ function AppContent() {
       bio: "Full-stack developer with 5 years of experience building web applications.",
       email: "arika.gibson@example.com",
       status: "active",
-      avatarUrl: "/src/assets/girl2.png",
+      avatarUrl: "/assets/girl2.png",
       isFeatured: false
     },
     {
@@ -94,7 +94,7 @@ function AppContent() {
       bio: "Creative designer specializing in user interface and experience design.",
       email: "julian.luzzader@example.com",
       status: "active",
-      avatarUrl: "/src/assets/boy.png",
+      avatarUrl: "/assets/boy.png",
       isFeatured: false
     },
     {
@@ -106,7 +106,7 @@ function AppContent() {
       bio: "Data scientist passionate about machine learning and artificial intelligence.",
       email: "viyata.ruta@example.com",
       status: "active",
-      avatarUrl: "/src/assets/girl.png",
+      avatarUrl: "/assets/girl.png",
       isFeatured: false
     }
   ]);
