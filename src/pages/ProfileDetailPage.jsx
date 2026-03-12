@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../App.module.css';
 
-function ProfileDetailPage({ mode, isEditMode, onDeleteProfile, allProfiles }) {
+function ProfileDetailPage({ mode, isEditMode, onDeleteProfile, allProfiles, profile: propProfile }) {
   const { id } = useParams();
-  const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(propProfile);
 
   useEffect(() => {
     // Find profile from allProfiles array using the :id parameter
@@ -26,6 +27,8 @@ function ProfileDetailPage({ mode, isEditMode, onDeleteProfile, allProfiles }) {
     );
     if (isConfirmed) {
       onDeleteProfile(profile.id);
+      // Navigate away after deletion
+      navigate('/', { replace: true });
     }
   };
 

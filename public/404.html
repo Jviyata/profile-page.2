@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting...</title>
+  <script>
+    // GitHub Pages 404 redirect for client-side routing
+    // This file handles 404s and redirects to index.html while preserving the requested path
+    (function() {
+      // Get the full pathname without the base path
+      const fullPath = window.location.pathname;
+      const basePath = '/profile-page.2';
+      
+      // Extract the route path after /profile-page.2
+      let routePath = fullPath.startsWith(basePath) ? fullPath.slice(basePath.length) : fullPath;
+      if (!routePath.startsWith('/')) {
+        routePath = '/' + routePath;
+      }
+      
+      // Store the intended route in sessionStorage so index.html can access it
+      sessionStorage.setItem('redirectPath', routePath);
+      
+      // Redirect to index.html
+      window.location.replace(basePath + '/');
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting to home page...</p>
+</body>
+</html>

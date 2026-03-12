@@ -7,6 +7,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      // Handle GitHub Pages 404 redirect for client-side routing
+      // If sessionStorage has a redirectPath, navigate to it after React mounts
+      if (sessionStorage.getItem('redirectPath')) {
+        const redirectPath = sessionStorage.getItem('redirectPath');
+        sessionStorage.removeItem('redirectPath');
+        // Store in sessionStorage for React Router to handle
+        sessionStorage.setItem('pendingNavigation', redirectPath);
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

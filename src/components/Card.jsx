@@ -1,9 +1,8 @@
-import React, { useRef, useLayoutEffect, useState, memo } from 'react';
+import React, { useRef, useLayoutEffect, memo } from 'react';
 import styles from '../App.module.css';
 
 const Card = memo(({ name, role, avatarUrl, onClick }) => {
   const cardRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useLayoutEffect(() => {
     if (cardRef.current) {
@@ -24,7 +23,6 @@ const Card = memo(({ name, role, avatarUrl, onClick }) => {
           src={avatarUrl} 
           alt={name}
           className={styles.avatarImgSmall}
-          onLoad={() => setIsLoaded(true)}
         />
       </div>
       <h3 className={styles.cardNameSmall}>{name}</h3>

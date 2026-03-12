@@ -1,7 +1,7 @@
 // Lab 13
 
 import React, { useState, useCallback, useMemo, lazy, Suspense, useEffect, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import styles from './App.module.css';
 
 // Import components
@@ -22,16 +22,23 @@ const ProfileDetailPage = lazy(() => import('./pages/ProfileDetailPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function AppContent() {
+  // Handle GitHub Pages 404 redirect for client-side routing
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (sessionStorage.getItem('pendingNavigation')) {
+      const redirectPath = sessionStorage.getItem('pendingNavigation');
+      sessionStorage.removeItem('pendingNavigation');
+      navigate(redirectPath, { replace: true });
+    }
+  }, [navigate]);
+
   // Navigation state
-  const [currentPage, setCurrentPage] = useState('home');
   const [selectedProfile, setSelectedProfile] = useState(null);
   
   // State for filters (local profiles)
   const [roleFilter, setRoleFilter] = useState('');
   const [searchText, setSearchText] = useState('');
-  
-  // State for UI modes
-  const [viewMode, setViewMode] = useState('view');
   
   // Get mode and isEditMode from Context
   const { mode, toggleMode, isEditMode, setIsEditMode } = useContext(ModeContext);
@@ -134,35 +141,7 @@ function AppContent() {
     fetchTitles();
   }, []);
 
-  // Fetch all profiles from API
-  useEffect(() => {
-    const fetchAllProfiles = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php');
-        const data = await response.json();
-        setApiProfiles(data.data || apiProfiles);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching profiles:', err);
-        setError('Failed to fetch profiles');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllProfiles();
-  }, []);
-
-  // Call filtered API when filters change
-  useEffect(() => {
-    if (roleFilter || searchText) {
-      fetchFilteredProfiles();
-    } else {
-      setProfiles(apiProfiles);
-    }
-  }, [roleFilter, searchText, apiProfiles]);
-
-  // Fetch filtered profiles from API
+  // Fetch filtered profiles from API - DEFINE FIRST
   const fetchFilteredProfiles = useCallback(async () => {
     setLoading(true);
     try {
@@ -184,6 +163,34 @@ function AppContent() {
       setLoading(false);
     }
   }, [roleFilter, searchText]);
+
+  // Fetch all profiles from API
+  useEffect(() => {
+    const fetchAllProfiles = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('https://web.ics.purdue.edu/~zong6/profile-app/fetch-data.php');
+        const data = await response.json();
+        setApiProfiles(data.data || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching profiles:', err);
+        setError('Failed to fetch profiles');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllProfiles();
+  }, []);
+
+  // Call filtered API when filters change - FIX INFINITE LOOP
+  useEffect(() => {
+    if (roleFilter || searchText) {
+      fetchFilteredProfiles();
+    } else {
+      setProfiles(apiProfiles);
+    }
+  }, [roleFilter, searchText, fetchFilteredProfiles]);
 
   const handleReset = useCallback(() => {
     setRoleFilter('');
@@ -212,13 +219,11 @@ function AppContent() {
     [mode]
   );
 
-  // Memoize Navbar props to prevent unnecessary re-renders
+  // Navbar gets isEditMode from context, doesn't need stale props
   const navbarProps = useMemo(() => ({
-    mode,
-    toggleMode,
     isEditMode,
     setIsEditMode
-  }), [mode, toggleMode, isEditMode, setIsEditMode]);
+  }), [isEditMode, setIsEditMode]);
 
   return (
     <div className={appClass}>
@@ -230,7 +235,6 @@ function AppContent() {
             element={
               <HomePage 
                 profiles={profiles}
-                viewMode={viewMode}
                 mode={mode}
                 roleFilter={roleFilter}
                 setRoleFilter={setRoleFilter}
@@ -238,7 +242,6 @@ function AppContent() {
                 setSearchText={setSearchText}
                 handleReset={handleReset}
                 uniqueRoles={uniqueRoles}
-                setViewMode={setViewMode}
                 onProfileClick={handleProfileClick}
                 loading={loading}
                 error={error}
@@ -258,7 +261,6 @@ function AppContent() {
               <FetchedProfilePage 
                 apiProfiles={apiProfiles}
                 mode={mode}
-                viewMode={viewMode}
                 onProfileClick={handleProfileClick}
                 loading={loading}
                 error={error}
