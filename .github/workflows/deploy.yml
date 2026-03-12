@@ -2,9 +2,9 @@ name: Build and Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, profile-page.2 ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, profile-page.2 ]
 
 jobs:
   build-and-deploy:
@@ -30,7 +30,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Upload artifact to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './dist'
+
       - name: Deploy to GitHub Pages
-        run: npm run deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref == 'refs/heads/profile-page.2'
+        id: deployment
+        uses: actions/deploy-pages@v2
