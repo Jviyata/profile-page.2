@@ -20,7 +20,6 @@ const AddProfilePage = lazy(() => import('./pages/AddProfilePage'));
 const FetchedProfilePage = lazy(() => import('./pages/FetchedProfilePage'));
 const ProfileDetailPage = lazy(() => import('./pages/ProfileDetailPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
-const ProfileLayout = lazy(() => import('./layouts/ProfileLayout'));
 
 function AppContent() {
   // Navigation state
@@ -268,24 +267,16 @@ function AppContent() {
             } 
           />
           
-          {/* Nested Profile Layout Route */}
           <Route 
-            path="/profile" 
-            element={<ProfileLayout mode={mode} />}
-          >
-            <Route 
-              path=":id" 
-              element={
-                <ProfileDetailPage 
-                  profile={selectedProfile} 
-                  mode={mode} 
-                  isEditMode={isEditMode} 
-                  onDeleteProfile={handleDeleteProfile}
-                  allProfiles={profiles}
-                />
-              } 
-            />
-          </Route>
+            path="/profile/:id" 
+            element={<ProfileDetailPage 
+              profile={selectedProfile} 
+              mode={mode} 
+              isEditMode={isEditMode} 
+              onDeleteProfile={handleDeleteProfile}
+              allProfiles={profiles}
+            />} 
+          />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
