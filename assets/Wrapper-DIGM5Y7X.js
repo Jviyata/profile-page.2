@@ -1,0 +1,1 @@
+import{n as e,o as t,s as n,t as r}from"./index-DWkTlU5x.js";var i=n(t(),1),a=r(),o=i.memo(function({title:t,children:n}){return(0,a.jsxs)(`section`,{className:e.sectionWrapper,children:[t&&(0,a.jsx)(`h2`,{className:e.sectionTitle,children:t}),(0,a.jsx)(`div`,{className:e.sectionContent,children:n})]})});export{o as t};
