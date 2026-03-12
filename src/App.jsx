@@ -8,10 +8,10 @@ import styles from './App.module.css';
 import Navbar from './components/Navbar';
 import ModeContext, { ModeProvider } from './context/ModeContext';
 
-// Import assets
-import girl2Img from './assets/girl2.png';
-import boyImg from './assets/boy.png';
-import girlImg from './assets/girl.png';
+// Image paths from public/assets
+const girl2Img = '/profile-page.2/assets/girl2.png';
+const boyImg = '/profile-page.2/assets/boy.png';
+const girlImg = '/profile-page.2/assets/girl.png';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./pages/HomePage'));
